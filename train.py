@@ -26,8 +26,8 @@ def get_net(load=False,input_size=128,num_layers=1,hidden_size=256,num_classes=1
     
     return net
 
-def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_models/speaker_classifier.test.pt"):
-
+def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_models/speaker_classifier.test.pt",device="cpu"):
+    net.to(device)
     net.train() #set train for dropout
 
     #Set loss function and optimizer algorithm (TO DO: change to cross entropy for multiclass task)
@@ -48,7 +48,7 @@ def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_m
             optimizer.zero_grad()
     
             # Step 2. Run our forward pass.
-            out = net(audio)
+            out = net(audio.to(device))
                      
             loss = loss_function(out, label)
             print("Out: ",out,"Label: ",label,"LOSS:",loss)
@@ -99,6 +99,8 @@ def init_argument_parser():
     parser.add_argument('--n_epochs',default=10,type=int,help="Number of epochs to run in training. Default 10")
     parser.add_argument('--lr',default=10e-3,type=float,help="Learning rate in adam optmizer algorithm. Default 10e-3")
     parser.add_argument('--momentum',default=0.7,type=float,help="Momentum in adam optimizer algorithm. Default 0.7")
+    parser.add_argument('--num_workers',default=1,type=float,help="Number of worker to parallelize data. Default 1")
+    parser.add_argument('--train_device',default="cpu",help="Number of worker to parallelize data. Default CPU")
 
     #Model parameters
     parser.add_argument('--input_size',default=128,type=int,help="The size of each input in each sequence, \
@@ -126,7 +128,7 @@ if __name__=="__main__":
     dataset=SpeechAudioDataset(audios_dir=args.data_dir)
 
     #Build dataloader
-    train_data=DataLoader(dataset, batch_size=1, shuffle=True)
+    train_data=DataLoader(dataset, batch_size=1, shuffle=True,num_workers=args.num_workers)
 
     for i,el in enumerate(train_data):
         print("Mel Spectrogram random audio:",el[0])
@@ -143,7 +145,7 @@ if __name__=="__main__":
 
     #Train net (in place)
     print("Start training...................")
-    train(net,train_data,n_epochs=args.n_epochs,lr=args.lr,momentum=args.momentum,model_path=args.model_path)
+    train(net,train_data,n_epochs=args.n_epochs,lr=args.lr,momentum=args.momentum,model_path=args.model_path,device=args.train_device)
 
     #Eval net (only training data)
     eval_net(net,train_data=train_data)
