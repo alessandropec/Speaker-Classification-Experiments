@@ -20,9 +20,9 @@ class SpeechAudioDataset(Dataset):
     def __getitem__(self, idx,hop_length=512,n_fft=2048):
         audio_path = os.path.join(self.audios_dir, self.audios_name[idx])
         signal,sr = librosa.load(audio_path) 
-        label = torch.tensor(int(self.audios_name[idx].split("-")[0]))
+        label = torch.tensor(int(self.audios_name[idx].split("-")[0]),dtype=torch.long)
         data=self.to_mel(signal,sr,hop_length,n_fft) 
-        return torch.reshape(torch.tensor(data),(data.shape[1],data.shape[0])),sr,torch.tensor(label,dtype=torch.long) #reshape #(mel,sr,label)
+        return torch.reshape(torch.tensor(data),(data.shape[1],data.shape[0])),sr,label #reshape #(mel,sr,label)
     
     def get_signal(self, idx):
         audio_path = os.path.join(self.audios_dir, self.audios_name[idx])

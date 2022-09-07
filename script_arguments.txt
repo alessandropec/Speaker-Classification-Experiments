@@ -1,0 +1,7 @@
+#FOR TRAIN
+python train.py --data_dir="./speaker_classifier_data" --model_path="./saved_models/speaker_classifier.test.pt" --n_epochs=10 --lr=10e-3 --momentum=0.7 --input_size=128 --hidden_size=256 --num_layers=1 --num_classes=2 --dropout=0.5 --train_device="cpu" --embedding_size=128
+--NOTE: --load_model to use already trained model specified locaion in mdel model_path
+
+#FOR PREDICTION
+python predict.py --data_dir=./speaker_classifier_data/unseen_samples --model_path=./saved_models/speaker_classifier.mini.is128.hs256.nl1.nc2.es64.pt
+--NOTE: you can specify the tag associated with label with --tag_label="0:speaker1;1:speaker2;2:speake3" please keep it ordered.

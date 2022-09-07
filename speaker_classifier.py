@@ -27,7 +27,7 @@ class LSTM_SpeakerClassifier(nn.Module):
       
         
     def forward(self, x):
-        #Layer,Batch,hidden
+        #Layer,Batch,hidden NOTE: random initialization could provide different output from same input
         h0,c0=(torch.randn(self.num_layers,x.size(0),self.hidden_size).to(self.device),torch.randn(self.num_layers,x.size(0), self.hidden_size).to(self.device)) # clean out hidden state
 
         #Output is the last layer for each time step [BS,seq,features] hn,cn is the last output (time step) for each layer
