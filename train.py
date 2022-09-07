@@ -112,9 +112,9 @@ if __name__=="__main__":
     args=init_argument_parser()
     print("******************************************************************************************\n\
             Welcome to Audio Classification Net training phase\n\
-            The following arguments will be used, press any key to continue...\
+            The following arguments will be used...\
         \n******************************************************************************************\n"+str(args)+"\n\n")
-    input()
+
     #Create ad hoc dataset
     dataset=SpeechAudioDataset(audios_dir=args.data_dir)
 
