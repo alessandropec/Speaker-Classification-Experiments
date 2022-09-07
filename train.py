@@ -101,7 +101,7 @@ def init_argument_parser():
                                                         output of lstm at each time step. Default 256")
     parser.add_argument('--num_layers',default=1,help="Number of hidden layers in lstm. Default 1")
     parser.add_argument('--num_classes',default=1,help="Number of classes (different cluster of audio). Default 1")
-    parser.add_argument('--dropout',default=0.5,help="Set the probability of dropout to regularize output in training. Default 0.5")
+    parser.add_argument('--dropout',default=0.5,type=float,help="Set the probability of dropout to regularize output in training. Default 0.5")
     args=parser.parse_args()
     return args
 
