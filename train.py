@@ -99,7 +99,7 @@ def init_argument_parser():
     parser.add_argument('--n_epochs',default=10,type=int,help="Number of epochs to run in training. Default 10")
     parser.add_argument('--lr',default=10e-3,type=float,help="Learning rate in adam optmizer algorithm. Default 10e-3")
     parser.add_argument('--momentum',default=0.7,type=float,help="Momentum in adam optimizer algorithm. Default 0.7")
-    parser.add_argument('--num_workers',default=1,type=float,help="Number of worker to parallelize data. Default 1")
+    parser.add_argument('--num_workers',default=1,type=int,help="Number of worker to parallelize data. Default 1")
     parser.add_argument('--train_device',default="cpu",help="Number of worker to parallelize data. Default CPU")
 
     #Model parameters
