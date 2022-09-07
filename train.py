@@ -39,7 +39,7 @@ def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_m
     
     for epoch in range(n_epochs):  # 
         epoch_loss=[]
-        print("\nEpoch:", epoch,"/"+str(n_epochs)+"\n")
+        print("\nEpoch:", epoch,"/"+str(n_epochs+1)+"\n")
         for audio,sr,label in train_data:
 
             # Step 1. Remember that Pytorch accumulates gradients.
