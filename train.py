@@ -89,18 +89,18 @@ def init_argument_parser():
     parser.add_argument('--load_net',default=False,help="load the net specified with --path argument. Default False")
 
     #Training parameters
-    parser.add_argument('--n_epochs',default=10,help="Number of epochs to run in training. Default 10")
-    parser.add_argument('--lr',default=10e-3,help="Learning rate in adam optmizer algorithm. Default 10e-3")
-    parser.add_argument('--momentum',default=0.7,help="Momentum in adam optimizer algorithm. Default 0.7")
+    parser.add_argument('--n_epochs',default=10,type=int,help="Number of epochs to run in training. Default 10")
+    parser.add_argument('--lr',default=10e-3,type=float,help="Learning rate in adam optmizer algorithm. Default 10e-3")
+    parser.add_argument('--momentum',default=0.7,type=float,help="Momentum in adam optimizer algorithm. Default 0.7")
 
     #Model parameters
-    parser.add_argument('--input_size',default=128,help="The size of each input in each sequence, \
+    parser.add_argument('--input_size',default=128,type=int,help="The size of each input in each sequence, \
                                                         i.e. the number of frame from mel sectrogram \
                                                         in each windows (fedded at each time-step). Default 128")
-    parser.add_argument('--hidden_size',default=256,help="The size of the hiddden layers, \
+    parser.add_argument('--hidden_size',default=256,type=int,help="The size of the hiddden layers, \
                                                         output of lstm at each time step. Default 256")
-    parser.add_argument('--num_layers',default=1,help="Number of hidden layers in lstm. Default 1")
-    parser.add_argument('--num_classes',default=1,help="Number of classes (different cluster of audio). Default 1")
+    parser.add_argument('--num_layers',default=1,type=int,help="Number of hidden layers in lstm. Default 1")
+    parser.add_argument('--num_classes',default=1,type=int,help="Number of classes (different cluster of audio). Default 1")
     parser.add_argument('--dropout',default=0.5,type=float,help="Set the probability of dropout to regularize output in training. Default 0.5")
     args=parser.parse_args()
     return args
