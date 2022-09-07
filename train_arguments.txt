@@ -1,1 +1,1 @@
-python train.py --data_dir="./speaker_classifier_data" --model_path="./saved_models/speaker_classifier.test.pt" --n_epochs=10 --lr=10e-3 --momentum=0.7 --input_size=128 --hidden_size=256 --num_layers=1 --num_classes=2 --dropout=0.5
+python train.py --data_dir="./speaker_classifier_data" --model_path="./saved_models/speaker_classifier.test.pt" --n_epochs=10 --lr=10e-3 --momentum=0.7 --input_size=128 --hidden_size=256 --num_layers=1 --num_classes=2 --dropout=0.5 --train_device="cpu"

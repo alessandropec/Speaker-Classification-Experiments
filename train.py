@@ -14,20 +14,20 @@ import matplotlib.pyplot as plt
 import argparse
 
 
-def get_net(load=False,input_size=128,num_layers=1,hidden_size=256,num_classes=1,dropout=0.5,model_path="./saved_models/speaker_classifier.test.pt"):
+def get_net(load=False,input_size=128,num_layers=1,hidden_size=256,num_classes=1,dropout=0.5,model_path="./saved_models/speaker_classifier.test.pt",device="cpu"):
     if not load:
         net = LSTM_SpeakerClassifier(input_size=input_size,num_layers=num_layers,hidden_size=hidden_size,
-                                     num_classes=num_classes,dropout=dropout)
+                                     num_classes=num_classes,dropout=dropout,device=device)
     else:
         net = LSTM_SpeakerClassifier(input_size=input_size,num_layers=num_layers,hidden_size=hidden_size,
-                                     num_classes=num_classes,dropout=dropout)
+                                     num_classes=num_classes,dropout=dropout,device=device)
         net.load_state_dict(torch.load(model_path))
         print("\nModel loaded...\n")
-    
+    net.to(device)
     return net
 
 def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_models/speaker_classifier.test.pt",device="cpu"):
-    net.to(device)
+
     net.train() #set train for dropout
 
     #Set loss function and optimizer algorithm (TO DO: change to cross entropy for multiclass task)
@@ -50,7 +50,7 @@ def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_m
             # Step 2. Run our forward pass.
             out = net(audio.to(device))
                      
-            loss = loss_function(out, label)
+            loss = loss_function(out, label.to(device))
             print("Out: ",out,"Label: ",label,"LOSS:",loss)
             loss.backward()
             optimizer.step()
@@ -72,17 +72,17 @@ def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_m
 
     
 
-def eval_net(net,train_data):
+def eval_net(net,train_data,device="cpu"):
     net.eval()
     avg_loss=[]
     loss_function = torch.nn.CrossEntropyLoss() #nn.NLLLoss()
     with torch.no_grad():
         print("\nOutput for training data")
         for audio,sr,label in train_data:
-            test_out = net(audio)
+            test_out = net(audio.to(device))
 
-            loss=loss_function(test_out,label)
-            avg_loss.append(loss)
+            loss=loss_function(test_out,label.to(device))
+            avg_loss.append(loss.cpu())
             print("Net out test: ",test_out[0],"Label: ",label,"Loss: ",loss)
         print("Avg loss for all data: ",np.mean(avg_loss))
 
@@ -137,15 +137,15 @@ if __name__=="__main__":
 
     #Load or build net
     net=get_net(load=args.load_net,input_size=args.input_size,num_layers=args.num_layers,\
-                hidden_size=args.hidden_size,num_classes=args.num_classes,dropout=args.dropout,model_path=args.model_path)
+                hidden_size=args.hidden_size,num_classes=args.num_classes,dropout=args.dropout,model_path=args.model_path,device=args.train_device)
     print("Model:\n",net)
 
     #Eval net (only training data)
-    eval_net(net,train_data=train_data)
+    eval_net(net,train_data=train_data,device=args.train_device)
 
     #Train net (in place)
     print("Start training...................")
     train(net,train_data,n_epochs=args.n_epochs,lr=args.lr,momentum=args.momentum,model_path=args.model_path,device=args.train_device)
 
     #Eval net (only training data)
-    eval_net(net,train_data=train_data)
+    eval_net(net,train_data=train_data,device=args.train_device)

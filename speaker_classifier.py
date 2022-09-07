@@ -2,13 +2,13 @@ import torch
 import torch.nn as nn
 
 class LSTM_SpeakerClassifier(nn.Module):
-    def __init__(self,input_size=128,num_layers=1,hidden_size=256,num_classes=2,dropout=0.5):
+    def __init__(self,input_size=128,num_layers=1,hidden_size=256,num_classes=2,dropout=0.5,device="cpu"):
         super(LSTM_SpeakerClassifier, self).__init__()
         self.input_size=input_size
         self.num_layers=num_layers
         self.hidden_size=hidden_size
         self.num_classes=num_classes
- 
+        self.device=device
         
 
         self.lstm=nn.LSTM(input_size=self.input_size,num_layers=self.num_layers,
@@ -27,7 +27,7 @@ class LSTM_SpeakerClassifier(nn.Module):
         
     def forward(self, x):
         #Layer,Batch,hidden
-        h0,c0=(torch.randn(self.num_layers,x.size(0),self.hidden_size),torch.randn(self.num_layers,x.size(0), self.hidden_size)) # clean out hidden state
+        h0,c0=(torch.randn(self.num_layers,x.size(0),self.hidden_size).to(self.device),torch.randn(self.num_layers,x.size(0), self.hidden_size).to(self.device)) # clean out hidden state
 
         #Output is the last layer for each time step [BS,seq,features] hn,cn is the last output (time step) for each layer
         output, (hn, cn) = self.lstm(x, (h0,c0))
