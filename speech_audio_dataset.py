@@ -22,7 +22,7 @@ class SpeechAudioDataset(Dataset):
         signal,sr = librosa.load(audio_path) 
         label = torch.tensor(int(self.audios_name[idx].split("-")[0]))
         data=self.to_mel(signal,sr,hop_length,n_fft) 
-        return torch.reshape(torch.tensor(data),(data.shape[1],data.shape[0])),sr,torch.tensor(label,dtype=torch.float32) #reshape #(mel,sr,label)
+        return torch.reshape(torch.tensor(data),(data.shape[1],data.shape[0])),sr,torch.tensor(label,dtype=torch.long) #reshape #(mel,sr,label)
     
     def get_signal(self, idx):
         audio_path = os.path.join(self.audios_dir, self.audios_name[idx])
