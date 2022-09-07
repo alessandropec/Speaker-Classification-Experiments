@@ -14,13 +14,13 @@ import matplotlib.pyplot as plt
 import argparse
 
 
-def get_net(load=False,input_size=128,num_layers=1,hidden_size=256,num_classes=1,dropout=0.5,model_path="./saved_models/speaker_classifier.test.pt",device="cpu"):
+def get_net(load=False,input_size=128,num_layers=1,hidden_size=256,num_classes=1,dropout=0.5,model_path="./saved_models/speaker_classifier.test.pt",device="cpu",embedding_size=128):
     if not load:
         net = LSTM_SpeakerClassifier(input_size=input_size,num_layers=num_layers,hidden_size=hidden_size,
-                                     num_classes=num_classes,dropout=dropout,device=device)
+                                     num_classes=num_classes,dropout=dropout,device=device,embedding_size=embedding_size)
     else:
         net = LSTM_SpeakerClassifier(input_size=input_size,num_layers=num_layers,hidden_size=hidden_size,
-                                     num_classes=num_classes,dropout=dropout,device=device)
+                                     num_classes=num_classes,dropout=dropout,device=device,embedding_size=embedding_size)
         net.load_state_dict(torch.load(model_path))
         print("\nModel loaded...\n")
     net.to(device)
@@ -110,6 +110,7 @@ def init_argument_parser():
                                                         output of lstm at each time step. Default 256")
     parser.add_argument('--num_layers',default=1,type=int,help="Number of hidden layers in lstm. Default 1")
     parser.add_argument('--num_classes',default=1,type=int,help="Number of classes (different cluster of audio). Default 1")
+    parser.add_argument('--embedding_size',default=128,type=int,help="The size of the first fully connected layer. Default 128")
     parser.add_argument('--dropout',default=0.5,type=float,help="Set the probability of dropout to regularize output in training. Default 0.5")
     args=parser.parse_args()
     return args
@@ -137,7 +138,8 @@ if __name__=="__main__":
 
     #Load or build net
     net=get_net(load=args.load_net,input_size=args.input_size,num_layers=args.num_layers,\
-                hidden_size=args.hidden_size,num_classes=args.num_classes,dropout=args.dropout,model_path=args.model_path,device=args.train_device)
+                hidden_size=args.hidden_size,num_classes=args.num_classes,dropout=args.dropout,embedding_size=args.embedding_size,\
+                model_path=args.model_path,device=args.train_device)
     print("Model:\n",net)
 
     #Eval net (only training data)

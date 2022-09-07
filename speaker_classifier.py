@@ -2,11 +2,12 @@ import torch
 import torch.nn as nn
 
 class LSTM_SpeakerClassifier(nn.Module):
-    def __init__(self,input_size=128,num_layers=1,hidden_size=256,num_classes=2,dropout=0.5,device="cpu"):
+    def __init__(self,input_size=128,num_layers=1,hidden_size=256,embedding_size=128,num_classes=2,dropout=0.5,device="cpu"):
         super(LSTM_SpeakerClassifier, self).__init__()
         self.input_size=input_size
         self.num_layers=num_layers
         self.hidden_size=hidden_size
+        self.embedding_size=embedding_size
         self.num_classes=num_classes
         self.device=device
         
@@ -15,10 +16,10 @@ class LSTM_SpeakerClassifier(nn.Module):
                           hidden_size=self.hidden_size,dropout=dropout,batch_first=True)        
         self.lstm_relu = nn.ReLU()
         
-        self.fc_1 =  nn.Linear(self.hidden_size, self.input_size) #fully connected 1
+        self.fc_1 =  nn.Linear(self.hidden_size, self.embedding_size) #fully connected 1
         self.fc_1_relu = nn.ReLU()
         
-        self.fc_2 = nn.Linear(self.input_size, self.num_classes) #fully connected last layer
+        self.fc_2 = nn.Linear(self.embedding_size, self.num_classes) #fully connected last layer
         self.fc_2_softmax = nn.Softmax(dim=1)
 
        
