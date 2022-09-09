@@ -29,9 +29,9 @@ def predict(net,dataset,tag_labels):
     tags_out=[]
     net.eval()
     with torch.no_grad():
-        for audio,sr,label in dataset:
-            print("Input shape: ",audio.shape)
-            out=net(audio.unsqueeze(0))
+        for data in dataset:
+            print("Input shape: ",len(data))
+            out=net(data[0].unsqueeze(0))
             print("Output: ",out)
             idx=out.argmax(dim=1)
             tags_out.append(tag_labels[idx])
@@ -49,11 +49,12 @@ if __name__=="__main__":
     #Create ad hoc dataset
     dataset=SpeechAudioDataset(audios_dir=args.data_dir)
 
-    net=get_net(128,1,256,2,0.5,model_path=args.model_path,embedding_size=64)
+    net=get_net(128,1,256,2,0.5,model_path=args.model_path,embedding_size=128)
 
     keys_values=args.label_tag.split(";")
     tags=[tag.split(":")[1] for tag in keys_values]
 
 
     tags_out=predict(net,dataset,tags)
-    print(tags_out,dataset.audios_name)
+    for i,(o,l) in enumerate(zip(tags_out,dataset.audios_name)):
+        print(i,") Output: ",o,"    Label: ",l)

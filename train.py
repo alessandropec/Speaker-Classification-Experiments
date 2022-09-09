@@ -4,6 +4,7 @@ from speaker_classifier import LSTM_SpeakerClassifier
 
 import torch
 from torch.utils.data import DataLoader
+from torch.nn.utils.rnn import pad_sequence
 
 import librosa
 
@@ -41,8 +42,10 @@ def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_m
     for epoch in range(n_epochs):  # 
         epoch_loss=[]
         print("\nEpoch:", epoch+1,"/"+str(n_epochs)+"\n")
-        for audio,sr,label in train_data:
-
+        for data in train_data:
+            audio=data[0]
+            label=torch.flatten(data[1])
+           
             # Step 1. Remember that Pytorch accumulates gradients.
             # We need to clear them out before each instance
             optimizer.zero_grad()
@@ -72,18 +75,20 @@ def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_m
 
     
 
-def eval_net(net,train_data,device="cpu"):
+def eval_net(net,train_data,device="cpu",n_classes=2):
     net.eval()
     avg_loss=[]
     loss_function = torch.nn.CrossEntropyLoss() #nn.NLLLoss()
     with torch.no_grad():
         print("\nOutput for training data")
-        for audio,sr,label in train_data:
+        for data in train_data:
+            audio=data[0]
+            label=torch.flatten(data[1])
             test_out = net(audio.to(device))
-
+      
             loss=loss_function(test_out,label.to(device))
             avg_loss.append(loss.cpu())
-            print("Net out test: ",test_out[0],"Label: ",label,"Loss: ",loss)
+            print("Net out test: ",test_out,"Label: ",label,"Loss: ",loss)
         print("Avg loss for all data: ",np.mean(avg_loss))
 
 def init_argument_parser():
@@ -101,6 +106,7 @@ def init_argument_parser():
     parser.add_argument('--momentum',default=0.7,type=float,help="Momentum in adam optimizer algorithm. Default 0.7")
     parser.add_argument('--num_workers',default=1,type=int,help="Number of worker to parallelize data. Default 1")
     parser.add_argument('--train_device',default="cpu",help="Number of worker to parallelize data. Default CPU")
+    parser.add_argument('--batch_size',default=2,type=int,help="Batch size, pad different length sequences. Default 2")
 
     #Model parameters
     parser.add_argument('--input_size',default=128,type=int,help="The size of each input in each sequence, \
@@ -115,6 +121,17 @@ def init_argument_parser():
     args=parser.parse_args()
     return args
 
+def pad_collate(batch):
+    #Remove sr in position 1
+
+    (xx, yy) = zip(*batch)
+    x_lens = [len(x) for x in xx]
+    y_lens = [len(y) for y in yy]
+
+    xx_pad = pad_sequence(xx, batch_first=True, padding_value=0)
+    yy_pad = pad_sequence(yy, batch_first=True, padding_value=0)
+
+    return xx_pad, yy_pad, x_lens, y_lens
 
 if __name__=="__main__":
 
@@ -129,11 +146,11 @@ if __name__=="__main__":
     dataset=SpeechAudioDataset(audios_dir=args.data_dir)
 
     #Build dataloader
-    train_data=DataLoader(dataset, batch_size=1, shuffle=True,num_workers=args.num_workers)
+    train_data=DataLoader(dataset, batch_size=args.batch_size, shuffle=True,collate_fn=pad_collate,num_workers=args.num_workers)
 
     for i,el in enumerate(train_data):
         print("Mel Spectrogram random audio:",el[0])
-        print("Audio shape with batch of 1: ",el[0].shape," Sample rate: ",el[1],"Label: ",el[2]) #(audio [B,in_len,seq_len],sr [1], label [1])
+        print("Audio shape with batch of ",args.batch_size,": ",el[0].shape,"Label: ",el[1]) #(audio [B,in_len,seq_len],sr [1], label [1])
         break
 
     #Load or build net

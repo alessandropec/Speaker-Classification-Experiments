@@ -32,7 +32,9 @@ class LSTM_SpeakerClassifier(nn.Module):
 
         #Output is the last layer for each time step [BS,seq,features] hn,cn is the last output (time step) for each layer
         output, (hn, cn) = self.lstm(x, (h0,c0))
-        out = output.view(-1, self.hidden_size)[-1].unsqueeze(0) #reshaping the data for Dense layer next and get only last 
+        out=torch.reshape(output,(output.size(0),output.size(2),output.size(1)))
+        out=out[:,:,-1] #Get only last timestep of last layer
+        #out = output.view(-1, self.hidden_size)[-1] #reshaping the data for Dense layer next and get only last 
         out = self.lstm_relu(out)
         
         out = self.fc_1(out) #first Dense
