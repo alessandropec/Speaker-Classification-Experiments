@@ -106,7 +106,7 @@ def init_argument_parser():
     parser.add_argument('--momentum',default=0.7,type=float,help="Momentum in adam optimizer algorithm. Default 0.7")
     parser.add_argument('--num_workers',default=1,type=int,help="Number of worker to parallelize data. Default 1")
     parser.add_argument('--train_device',default="cpu",help="Number of worker to parallelize data. Default CPU")
-    parser.add_argument('--batch_size',default=2,help="Batch size, pad different length sequences. Default 2")
+    parser.add_argument('--batch_size',default=2,type=int,help="Batch size, pad different length sequences. Default 2")
 
     #Model parameters
     parser.add_argument('--input_size',default=128,type=int,help="The size of each input in each sequence, \
