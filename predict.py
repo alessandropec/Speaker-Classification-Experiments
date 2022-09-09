@@ -23,6 +23,18 @@ def init_argument_parser():
     parser.add_argument('--data_dir', required=True, help='the folder containing the sample audio (name ex: 0_1_1234.wav)\nfirst digit (0) is the label speaker id')
     parser.add_argument('--model_path', required=True, help='root of the model to load/save')
     parser.add_argument('--label_tag',default="0:Jeremy Clarkson;1:Greta Thunberg",help="Use follow syntax to declare label: 0:Speaker1;1Speaker2")
+    
+    #Model parameters
+    #Model parameters
+    parser.add_argument('--input_size',default=128,type=int,help="The size of each input in each sequence, \
+                                                        i.e. the number of frame from mel sectrogram \
+                                                        in each windows (fedded at each time-step). Default 128")
+    parser.add_argument('--hidden_size',default=256,type=int,help="The size of the hiddden layers, \
+                                                        output of lstm at each time step. Default 256")
+    parser.add_argument('--num_layers',default=1,type=int,help="Number of hidden layers in lstm. Default 1")
+    parser.add_argument('--num_classes',default=1,type=int,help="Number of classes (different cluster of audio). Default 1")
+    parser.add_argument('--embedding_size',default=128,type=int,help="The size of the first fully connected layer. Default 128")
+    
     return parser.parse_args()
 
 def predict(net,dataset,tag_labels):
@@ -49,7 +61,7 @@ if __name__=="__main__":
     #Create ad hoc dataset
     dataset=SpeechAudioDataset(audios_dir=args.data_dir)
 
-    net=get_net(128,1,256,2,0.5,model_path=args.model_path,embedding_size=128)
+    net=get_net(args.input_size,args.num_layers,args.hidden_size,args.num_classes,0,model_path=args.model_path,embedding_size=128)
 
     keys_values=args.label_tag.split(";")
     tags=[tag.split(":")[1] for tag in keys_values]
