@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 import argparse
 
 
+
+
 def get_net(load=False,input_size=128,num_layers=1,hidden_size=256,num_classes=1,dropout=0.5,model_path="./saved_models/speaker_classifier.test.pt",device="cpu",embedding_size=128):
     if not load:
         net = LSTM_SpeakerClassifier(input_size=input_size,num_layers=num_layers,hidden_size=hidden_size,
@@ -27,7 +29,9 @@ def get_net(load=False,input_size=128,num_layers=1,hidden_size=256,num_classes=1
     net.to(device)
     return net
 
-def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_models/speaker_classifier.test.pt",device="cpu"):
+def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,gamma=10e-6,model_path=".saved_models/speaker_classifier.test.pt",device="cpu"):
+
+    
 
     net.train() #set train for dropout
 
@@ -35,6 +39,8 @@ def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_m
     loss_function = torch.nn.CrossEntropyLoss() #nn.NLLLoss()
     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=momentum)
 
+  
+    scheduler=torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma, last_epoch=- 1, verbose=True)
 
     #Accumulate the avg score of each epoch
     avg_epoch_loss=[]
@@ -59,6 +65,8 @@ def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,model_path=".saved_m
             optimizer.step()
 
             epoch_loss.append(loss.item())
+            
+        scheduler.step()
 
         avg_loss=np.mean(epoch_loss)
         avg_epoch_loss.append(np.mean(avg_loss))
@@ -107,6 +115,7 @@ def init_argument_parser():
     parser.add_argument('--num_workers',default=1,type=int,help="Number of worker to parallelize data. Default 1")
     parser.add_argument('--train_device',default="cpu",help="Number of worker to parallelize data. Default CPU")
     parser.add_argument('--batch_size',default=2,type=int,help="Batch size, pad different length sequences. Default 2")
+    parser.add_argument('--gamma',default=0.9,type=float,help="Gamma factor for exponantial scheduler lr decay. Default 0.9")
 
     #Model parameters
     parser.add_argument('--input_size',default=128,type=int,help="The size of each input in each sequence, \
@@ -164,7 +173,7 @@ if __name__=="__main__":
 
     #Train net (in place)
     print("Start training...................")
-    train(net,train_data,n_epochs=args.n_epochs,lr=args.lr,momentum=args.momentum,model_path=args.model_path,device=args.train_device)
+    train(net,train_data,n_epochs=args.n_epochs,lr=args.lr,momentum=args.momentum,model_path=args.model_path,device=args.train_device,gamma=args.gamma)
 
     #Eval net (only training data)
     eval_net(net,train_data=train_data,device=args.train_device)
