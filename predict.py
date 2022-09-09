@@ -61,7 +61,7 @@ if __name__=="__main__":
     #Create ad hoc dataset
     dataset=SpeechAudioDataset(audios_dir=args.data_dir)
 
-    net=get_net(args.input_size,args.num_layers,args.hidden_size,args.num_classes,0,model_path=args.model_path,embedding_size=128)
+    net=get_net(args.input_size,args.num_layers,args.hidden_size,args.num_classes,dropout=0,model_path=args.model_path,embedding_size=args.embedding_size)
 
     keys_values=args.label_tag.split(";")
     tags=[tag.split(":")[1] for tag in keys_values]
