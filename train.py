@@ -76,7 +76,9 @@ def train(net,train_data,n_epochs=100,lr=10e-4,momentum=0.8,gamma=10e-6,model_pa
         torch.save(net.state_dict(), model_path)
     
     print("Training finished loss for each epochs plotted:")
+    plt.figure()
     plt.plot(avg_epoch_loss)
+    plt.savefig("./training.png")
     plt.show()
 
 
